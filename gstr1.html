@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GSTR-1 to Tally Pro</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="supabase-client.js"></script>
+  <link rel="stylesheet" href="css/styles1.css" />
+  <style>
+    .topnav { background:#1e293b; padding:12px 24px; display:flex; align-items:center; gap:16px; border-bottom:1px solid #334155; }
+    .topnav .brand { color:#f8fafc; font-weight:800; font-size:18px; margin-right:auto; }
+    .topnav a { color:#94a3b8; text-decoration:none; font-size:14px; padding:8px 16px; border-radius:8px; transition:background 0.2s; }
+    .topnav a:hover, .topnav a.active { background:#334155; color:#f8fafc; }
+    .topnav .logout-btn { background:#ef4444; color:#fff; border:none; padding:8px 16px; border-radius:8px; cursor:pointer; font-size:14px; font-weight:600; }
+    .topnav .logout-btn:hover { background:#dc2626; }
+  </style>
+</head>
+<body>
+  <nav class="topnav">
+    <span class="brand">GST Master</span>
+    <a href="gstr1.html" class="active">GSTR-1 to Tally</a>
+    <a href="gstr2b.html">GSTR-2B Automation</a>
+    <a href="gstr3b.html">GSTR-3B Aggregator</a>
+    <button class="logout-btn" id="logoutBtn">Logout</button>
+  </nav>
+
+  <!-- EXACT ORIGINAL GSTR-1 BODY BELOW -->
+  <div class="app-root">
+    <div class="page-center">
+      <div class="app-shell">
+        <div class="app-card">
+          <div class="topbar">
+            <div>
+              <h1>GSTR-1 Multi-Month Aggregator</h1>
+              <div class="small-note">Upload one or more GSTR-1 JSON files from the same financial year.</div>
+            </div>
+            <div class="btn-row">
+              <div id="userInfo" class="user-info"></div>
+              <button id="btnRefreshNames">Refresh Names</button>
+              <button id="btnImportNames">Import Names</button>
+              <button id="btnDownloadMissingExcel">Download Missing GSTINs</button>
+            </div>
+          </div>
+
+          <div class="section">
+            <h3 class="section-title">Upload JSON</h3>
+            <div class="drop-zone" id="dropZone">
+              <input id="fileInput" type="file" multiple accept=".json,application/json" />
+              <div>
+                <strong>Drag &amp; drop your GSTR-1 JSON files here</strong>
+                <div class="help-text">Or click to browse files. Files are processed locally in your browser.</div>
+              </div>
+            </div>
+            <div id="loadingIndicator" style="display:none;text-align:center;padding:16px;color:#6366f1;">Processing files...</div>
+            <div id="errorMsg" style="color:#ef4444;padding:8px 0;"></div>
+          </div>
+
+          <div class="controls-bar" id="controlsBar" style="display:none;">
+            <div class="filters">
+              <label for="monthSelector">Month</label>
+              <select id="monthSelector"></select>
+              <label for="reportSelector">Report</label>
+              <select id="reportSelector">
+                <option value="ALL_BILLS">All Bills</option>
+                <option value="B2B_RCM">B2B / RCM</option>
+                <option value="B2CS">B2C Small</option>
+                <option value="B2CL">B2C Large</option>
+                <option value="CDN">Credit / Debit Notes</option>
+                <option value="AMENDMENTS">Amendments</option>
+                <option value="HSN">HSN Summary</option>
+              </select>
+            </div>
+            <div class="actions">
+              <button id="btnUnifiedXML">Download Tally XML</button>
+              <button id="btnExcel">Download Excel</button>
+              <button id="btnFullBillsExcel">Download Full Bills</button>
+            </div>
+          </div>
+
+          <div id="results" style="display:none;">
+            <div id="reportMeta" class="report-meta"></div>
+            <div class="table-container">
+              <table>
+                <thead id="tableHead"></thead>
+                <tbody id="tableBody"></tbody>
+                <tfoot id="tableFooter"></tfoot>
+              </table>
+            </div>
+          </div>
+
+          <div class="names-section">
+            <div class="names-grid">
+              <div>
+                <label>Missing GSTINs</label>
+                <textarea id="missingGstinBox" readonly placeholder="Missing GSTINs will appear here after upload"></textarea>
+                <div class="btn-row" style="margin-top:8px;">
+                  <button id="btnCopyMissing">Copy Missing GSTINs</button>
+                </div>
+              </div>
+              <div>
+                <label>Paste GSTIN,PartyName</label>
+                <textarea id="gstNamePasteBox" placeholder="GSTIN,PartyName (one per line)"></textarea>
+                <div class="btn-row" style="margin-top:8px;">
+                  <button id="btnSavePastedNames">Save Names</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <input type="file" id="importNamesInput" style="display:none;" accept=".xlsx,.xls,.csv" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/gstr1-to-tally-pro-v2.js"></script>
+  <script>
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      await supabaseClient.auth.signOut();
+      window.location.href = 'index.html';
+    });
+  </script>
+</body>
+</html>

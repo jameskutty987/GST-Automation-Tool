@@ -3,271 +3,82 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GST Master Unified</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <title>GST Master — Login</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <link rel="stylesheet" href="css/shell.css" />
-  <link rel="stylesheet" href="css/module-gstr1.css" />
-  <link rel="stylesheet" href="css/module-gstr2b.css" />
-  <script defer src="js/supabase-client.js"></script>
-  <script defer src="js/auth.js"></script>
-  <script defer src="js/module-gstr1.js"></script>
-  <script defer src="js/module-gstr2b.js"></script>
-  <script defer src="js/module-gstr3b.js"></script>
-  <script defer src="js/router.js"></script>
+  <script src="supabase-client.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: #0f172a; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .card { background: #1e293b; border-radius: 16px; padding: 48px 40px; width: 100%; max-width: 420px; box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
+    .logo { text-align: center; margin-bottom: 32px; }
+    .logo h1 { color: #f8fafc; font-size: 28px; font-weight: 800; }
+    .logo p { color: #94a3b8; font-size: 14px; margin-top: 6px; }
+    label { display: block; color: #cbd5e1; font-size: 13px; font-weight: 600; margin-bottom: 6px; margin-top: 20px; }
+    input { width: 100%; padding: 12px 16px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #f8fafc; font-size: 15px; outline: none; transition: border-color 0.2s; }
+    input:focus { border-color: #6366f1; }
+    .btn { width: 100%; margin-top: 28px; padding: 14px; background: #6366f1; color: #fff; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+    .btn:hover { background: #4f46e5; }
+    .btn:disabled { background: #475569; cursor: not-allowed; }
+    .msg { margin-top: 16px; font-size: 14px; text-align: center; min-height: 20px; }
+    .links { margin-top: 24px; text-align: center; }
+    .links a { color: #6366f1; font-size: 13px; text-decoration: none; }
+    .links a:hover { text-decoration: underline; }
+  </style>
 </head>
 <body>
-  <div class="app-root">
-    <section id="authScreen" class="auth-screen">
-      <div class="auth-wrap">
-        <h1>GST Master Unified</h1>
-        <p>One login, one link, three GST workspaces.</p>
-        <label for="email">Email</label>
-        <input id="email" type="email" placeholder="Enter email" autocomplete="username" />
-        <label for="password">Password</label>
-        <input id="password" type="password" placeholder="Enter password" autocomplete="current-password" />
-        <div class="auth-actions">
-          <button class="btn-shell secondary" id="signupBtn" type="button">Sign up</button>
-          <button class="btn-shell" id="loginBtn" type="button">Login</button>
-        </div>
-        <div id="message" class="auth-message"></div>
-      </div>
-    </section>
-
-    <section id="dashboard" class="dashboard hidden">
-      <aside class="sidebar">
-        <div class="brand">
-          <h2>GST Master</h2>
-          <p>Unified tax automation workspace</p>
-        </div>
-        <button class="nav-btn active" data-target="module-gstr1" type="button">GSTR-1 to Tally</button>
-        <button class="nav-btn" data-target="module-gstr2b" type="button">GSTR-2B Automation</button>
-        <button class="nav-btn" data-target="module-gstr3b" type="button">GSTR-3B Aggregator</button>
-        <div class="user-box">
-          <div id="userInfo">Checking session...</div>
-          <button id="logoutBtn" class="logout" type="button">Logout</button>
-        </div>
-      </aside>
-      <main class="main">
-        <section id="module-gstr1" class="module-panel active">
-          <div class="module-shell-card">
-            <div class="module-intro">
-              <h2>GSTR-1 to Tally Pro</h2>
-              <p>Upload JSON files, resolve GST master names, and export XML/Excel for accounting.</p>
-            </div>
-            <div class="page-center">
-              <div class="app-shell">
-                <div class="app-card">
-                  <div class="topbar">
-                    <div>
-                      <h1>GSTR-1 Multi-Month Aggregator</h1>
-                      <div class="small-note">Upload one or more GSTR-1 JSON files from the same financial year.</div>
-                    </div>
-                    <div class="btn-row">
-                      <button id="refreshNamesBtn" type="button">Refresh Names</button>
-                      <button id="importNamesBtn" type="button">Import Names</button>
-                      <button id="downloadMissingBtn" type="button">Download Missing GSTINs</button>
-                      <button id="logoutInnerBtn" type="button" class="btn-success">Logout</button>
-                    </div>
-                  </div>
-
-                  <div class="section">
-                    <h3 class="section-title">Upload JSON</h3>
-                    <div class="drop-zone" id="uploadDropZone">
-                      <input id="fileInput" type="file" multiple accept=".json,application/json" />
-                      <div>
-                        <strong>Drag & drop your GSTR-1 JSON files here</strong>
-                        <div class="help-text">Or click to browse files. Files are processed locally in your browser.</div>
-                      </div>
-                    </div>
-                    <div class="gst-grid">
-                      <div>
-                        <label for="fyLabel">Financial Year</label>
-                        <input id="fyLabel" type="text" readonly placeholder="Will be detected after upload" />
-                      </div>
-                      <div>
-                        <label for="moduleStatus">Status</label>
-                        <input id="moduleStatus" type="text" readonly placeholder="Waiting for files" />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="controls-bar" id="controlsBar">
-                    <div class="filters">
-                      <label for="reportType">Report</label>
-                      <select id="reportType"></select>
-                      <label for="monthSelector">Month</label>
-                      <select id="monthSelector"></select>
-                    </div>
-                    <div class="actions">
-                      <button id="downloadExcelBtn" type="button">Download Excel</button>
-                      <button id="downloadXmlBtn" type="button">Download XML</button>
-                      <button id="downloadFullBillsBtn" type="button">Download Full Bills</button>
-                      <button id="clearBtn" type="button">Clear</button>
-                    </div>
-                  </div>
-
-                  <div class="results-wrap" id="resultsWrap">
-                    <div class="report-meta" id="reportMeta">No data loaded.</div>
-                    <div class="table-container">
-                      <table id="reportTable"></table>
-                    </div>
-                  </div>
-
-                  <div id="statusBox" class="message-box"></div>
-
-                  <input type="file" id="importNamesInput" class="hidden" accept=".xlsx,.xls,.csv" />
-                  <textarea id="gstNamePasteBox" class="hidden" placeholder="GSTIN,PartyName"></textarea>
-                  <textarea id="missingGstinBox" class="hidden" readonly></textarea>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section id="module-gstr2b" class="module-panel">
-          <div class="module-shell-card">
-            <div class="module-intro">
-              <h2>GSTR-2B Premium Automation</h2>
-              <p>Upload JSON files, inspect reports, and generate Excel/XML directly in the browser.</p>
-            </div>
-            <div class="container">
-              <section class="topbar">
-                <div class="title">
-                  <h1>GSTR 2B Automation</h1>
-                  <p>Premium client-side dashboard for report generation and Excel export.</p>
-                </div>
-                <div class="actions">
-                  <button class="btn" id="themeBtn">🌙 Night mode</button>
-                  <button class="btn" id="downloadExcelBtn2">Download current Excel</button>
-                  <button class="btn accent" id="downloadXmlBtn2">Download Tally XML</button>
-                </div>
-              </section>
-
-              <div class="grid">
-                <section class="upload-card">
-                  <div class="dropzone" id="dropzone">
-                    <h3>Upload GSTR-2B JSON</h3>
-                    <p>Upload one or more files from the same financial year. Data is processed only in your browser and not stored on any server.</p>
-                    <input type="file" id="fileInput2" multiple accept=".json,application/json" />
-                    <div class="chips" id="fileChips"></div>
-                  </div>
-
-                  <div class="field-grid">
-                    <div class="field">
-                      <label>Purchase ledger</label>
-                      <input id="ledgerPurchase" value="Purchase Account" />
-                    </div>
-                    <div class="field">
-                      <label>Input IGST ledger</label>
-                      <input id="ledgerIgst" value="Input Igst" />
-                    </div>
-                    <div class="field">
-                      <label>Input CGST ledger</label>
-                      <input id="ledgerCgst" value="Input Cgst" />
-                    </div>
-                    <div class="field">
-                      <label>Input SGST ledger</label>
-                      <input id="ledgerSgst" value="Input Sgst" />
-                    </div>
-                  </div>
-
-                  <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap">
-                    <button class="btn primary" id="processBtn">Process files</button>
-                  </div>
-
-                  <div class="status" id="statusBox2">Upload GSTR-2B JSON file(s) and click Process files.</div>
-                </section>
-
-                <div>
-                  <section class="filters">
-                    <div class="field">
-                      <label>Section</label>
-                      <select id="sectionSelect">
-                        <option value="ALL">All sections</option>
-                      </select>
-                    </div>
-                    <div class="field">
-                      <label>Report type</label>
-                      <select id="viewSelect">
-                        <option value="summary">Summary</option>
-                        <option value="bills">Bill wise details</option>
-                      </select>
-                    </div>
-                    <div class="field">
-                      <label>Month</label>
-                      <select id="monthSelect">
-                        <option value="ALL">All months</option>
-                      </select>
-                    </div>
-                    <div class="field">
-                      <label>Search</label>
-                      <input id="searchInput" placeholder="Party, GSTIN, invoice, HSN" />
-                    </div>
-                  </section>
-
-                  <section class="report-card">
-                    <div class="report-head">
-                      <div>
-                        <h2 id="reportTitle">Report output</h2>
-                        <p id="reportMeta2">No data loaded</p>
-                      </div>
-                      <div class="chips" id="detectedChips"></div>
-                    </div>
-                    <div class="scroll-wrap">
-                      <div id="reportTable"></div>
-                    </div>
-                  </section>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section id="module-gstr3b" class="module-panel">
-          <div class="module-shell-card">
-            <div class="module-intro">
-              <h2>GSTR-3B Multi-Month Aggregator</h2>
-              <p>Upload JSON files from one financial year, review structured sections, and export report data.</p>
-            </div>
-            <div id="g3Message" class="notice">Choose return type, upload JSON files, and click Process files.</div>
-            <div class="g3-grid">
-              <div class="g3-card">
-                <h3>Controls</h3>
-                <div class="g3-field">
-                  <label for="g3ReturnType">Return type</label>
-                  <select id="g3ReturnType">
-                    <option value="GSTR-3B">GSTR-3B</option>
-                    <option value="GSTR-1">GSTR-1</option>
-                  </select>
-                </div>
-                <div class="g3-field">
-                  <label for="g3Files">Upload JSON files</label>
-                  <input id="g3Files" type="file" accept=".json,application/json" multiple />
-                </div>
-                <div class="g3-field">
-                  <label for="g3Report">Report view</label>
-                  <select id="g3Report"></select>
-                </div>
-                <div class="g3-actions">
-                  <button class="btn-shell" id="g3Process" type="button">Process files</button>
-                  <button class="btn-shell secondary" id="g3Reset" type="button">Reset</button>
-                  <button class="btn-shell secondary" id="g3Excel" type="button">Download Excel</button>
-                </div>
-                <div class="tag-row" id="g3Tags"></div>
-              </div>
-              <div class="g3-card">
-                <h3>Report output</h3>
-                <div id="g3TableWrap" class="g3-table-wrap"></div>
-              </div>
-            </div>
-          </div>
-        </section>
-      </main>
-    </section>
+  <div class="card">
+    <div class="logo">
+      <h1>GST Master</h1>
+      <p>Unified GST Automation Workspace</p>
+    </div>
+    <label for="email">Email address</label>
+    <input id="email" type="email" placeholder="you@example.com" autocomplete="username" />
+    <label for="password">Password</label>
+    <input id="password" type="password" placeholder="Enter password" autocomplete="current-password" />
+    <button class="btn" id="loginBtn" type="button">Login</button>
+    <div class="msg" id="message"></div>
+    <div class="links">
+      <a href="gstr1.html">GSTR-1 to Tally</a> &nbsp;|&nbsp;
+      <a href="gstr2b.html">GSTR-2B Automation</a> &nbsp;|&nbsp;
+      <a href="gstr3b.html">GSTR-3B Aggregator</a>
+    </div>
   </div>
+  <script>
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const loginBtn = document.getElementById('loginBtn');
+    const messageEl = document.getElementById('message');
+
+    function showMessage(msg, isError = false) {
+      messageEl.textContent = msg;
+      messageEl.style.color = isError ? '#ef4444' : '#22c55e';
+    }
+
+    async function handleLogin() {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value.trim();
+      if (!email || !password) { showMessage('Enter email and password.', true); return; }
+      loginBtn.disabled = true;
+      loginBtn.textContent = 'Logging in...';
+      try {
+        const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        if (error) { showMessage(error.message, true); return; }
+        showMessage('Login successful. Redirecting...');
+        window.location.href = './gstr1.html';
+      } catch (err) {
+        showMessage(err.message || 'Login failed.', true);
+      } finally {
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Login';
+      }
+    }
+
+    loginBtn.addEventListener('click', handleLogin);
+    passwordInput.addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
+
+    supabaseClient.auth.getSession().then(({ data }) => {
+      if (data?.session) window.location.href = './gstr1.html';
+    });
+  </script>
 </body>
 </html>
