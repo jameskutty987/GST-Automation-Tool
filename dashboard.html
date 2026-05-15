@@ -537,9 +537,9 @@
         </button>
       </div>
 
-      <!-- Module 3 — Coming Soon -->
-      <div class="module-card disabled">
-        <span class="card-badge badge-soon">Coming Soon</span>
+      <!-- Module 3 — GSTR-3B Aggregator -->
+      <div class="module-card" onclick="openModule('https://gst-automation-tool.onrender.com/')" target="_blank">
+        <span class="card-badge badge-active">Active</span>
         <div class="card-icon icon-purple">
           <svg viewBox="0 0 24 24">
             <line x1="18" y1="20" x2="18" y2="10"/>
@@ -559,8 +559,9 @@
           <span class="tag">Interest &amp; Late Fee</span>
           <span class="tag">Payment of Tax</span>
         </div>
-        <button class="card-btn disabled-btn" type="button" disabled>
-          Coming Soon
+        <button class="card-btn" type="button">
+          Open Module
+          <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </button>
       </div>
 
@@ -587,7 +588,11 @@
 
     // Module navigation
     function openModule(path) {
-      window.location.href = path;
+      if (path.startsWith('http')) {
+        window.open(path, '_blank');
+      } else {
+        window.location.href = path;
+      }
     }
   </script>
 </body>
