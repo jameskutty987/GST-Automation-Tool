@@ -10,37 +10,37 @@ function showMessage(msg, isError = false) {
   messageEl.style.color = isError ? "#dc2626" : "#059669";
 }
 
-async function handleSignup() {
-  const email = (emailInput?.value || "").trim();
-  const password = (passwordInput?.value || "").trim();
+//async function handleSignup() {
+  //const email = (emailInput?.value || "").trim();
+  //const password = (passwordInput?.value || "").trim();
 
-  if (!email || !password) {
-    showMessage("Enter email and password.", true);
-    return;
-  }
+  //if (!email || !password) {
+    //showMessage("Enter email and password.", true);
+    //return;
+  //}
 
-  try {
+  //try {
     //if (signupBtn) signupBtn.disabled = true;
-    if (loginBtn) loginBtn.disabled = true;
+   // if (loginBtn) loginBtn.disabled = true;
 
-    const { error } = await supabaseClient.auth.signUp({
-      email,
-      password
-    });
+    //const { error } = await supabaseClient.auth.signUp({
+      //email,
+      //password
+    //});
 
-    if (error) {
-      showMessage(error.message, true);
-      return;
-    }
+   // if (error) {
+      //showMessage(error.message, true);
+      //return;
+    //}
 
-    showMessage("Signup successful. Check your email if confirmation is enabled.");
-  } catch (err) {
-    showMessage(err.message || "Signup failed.", true);
-  } finally {
+    //showMessage("Signup successful. Check your email if confirmation is enabled.");
+  //} catch (err) {
+    //showMessage(err.message || "Signup failed.", true);
+  //} finally {
     //if (signupBtn) signupBtn.disabled = false;
-    if (loginBtn) loginBtn.disabled = false;
-  }
-}
+    //if (loginBtn) loginBtn.disabled = false;
+  //}
+//}
 
 async function handleLogin() {
   const email = (emailInput?.value || "").trim();
