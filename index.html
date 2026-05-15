@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GST Automation Tool — Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #07101f;
+      --card-bg: #0f1c30;
+      --primary: #2563eb;
+      --primary-glow: rgba(37, 99, 235, 0.35);
+      --text: #e8f0fe;
+      --muted: #7b92b2;
+      --border: rgba(255, 255, 255, 0.07);
+      --input-bg: rgba(255, 255, 255, 0.04);
+      --success: #10b981;
+      --danger: #f87171;
+    }
+
+    body {
+      font-family: 'Sora', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Subtle grid */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(37, 99, 235, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(37, 99, 235, 0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Blue glow orb top-left */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .orb-1 {
+      width: 520px; height: 520px;
+      top: -160px; left: -120px;
+      background: radial-gradient(circle, rgba(37,99,235,0.14) 0%, transparent 65%);
+    }
+    .orb-2 {
+      width: 400px; height: 400px;
+      bottom: -120px; right: -80px;
+      background: radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 65%);
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 400px;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Brand */
+    .brand {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .brand-icon {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+      border-radius: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 28px rgba(37, 99, 235, 0.45);
+    }
+
+    .brand-icon svg {
+      width: 30px;
+      height: 30px;
+      stroke: white;
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .brand-name {
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: 0.07em;
+      color: var(--text);
+    }
+
+    .brand-sub {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 5px;
+      font-weight: 400;
+      letter-spacing: 0.03em;
+    }
+
+    /* Card */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 24px;
+      color: var(--text);
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .form-group input {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 0.92rem;
+      font-family: 'Sora', sans-serif;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+
+    .form-group input::placeholder {
+      color: rgba(123, 146, 178, 0.45);
+    }
+
+    .form-group input:focus {
+      border-color: var(--primary);
+      background: rgba(37, 99, 235, 0.06);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 13px;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Sora', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.02em;
+      transition: all 0.2s;
+    }
+
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+      color: white;
+      margin-top: 8px;
+      box-shadow: 0 4px 18px var(--primary-glow);
+    }
+
+    .btn-primary:not(:disabled):hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 28px rgba(37, 99, 235, 0.5);
+    }
+
+    .btn-primary:not(:disabled):active {
+      transform: translateY(0);
+      box-shadow: 0 2px 10px var(--primary-glow);
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 18px 0;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .divider span {
+      font-size: 0.7rem;
+      color: var(--muted);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--text);
+    }
+
+    .btn-outline:not(:disabled):hover {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: rgba(255, 255, 255, 0.18);
+    }
+
+    #message {
+      margin-top: 16px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      min-height: 20px;
+      text-align: center;
+      transition: color 0.2s;
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 22px;
+      letter-spacing: 0.02em;
+    }
+
+    @media (max-width: 480px) {
+      .card { padding: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <div class="page">
+    <div class="brand">
+      <div class="brand-icon">
+        <!-- Layers / stacked sheets icon -->
+        <svg viewBox="0 0 24 24">
+          <path d="M2 17L12 22L22 17"/>
+          <path d="M2 12L12 17L22 12"/>
+          <path d="M12 2L2 7L12 12L22 7L12 2Z"/>
+        </svg>
+      </div>
+      <div class="brand-name">GST AUTOMATION TOOL</div>
+      <div class="brand-sub">Integrated GST Filing &amp; Tally Automation</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Sign in to continue</div>
+
+      <div class="form-group">
+        <label>Email Address</label>
+        <input id="email" type="email" placeholder="you@company.com" autocomplete="email" />
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <input id="password" type="password" placeholder="Enter your password" autocomplete="current-password" />
+      </div>
+
+      <button id="loginBtn" class="btn btn-primary" type="button">Login</button>
+
+      <div class="divider"><span>OR</span></div>
+
+      <button id="signupBtn" class="btn btn-outline" type="button">Create Account</button>
+
+      <p id="message"></p>
+    </div>
+
+    <p class="footer">GST Automation Tool &copy; 2025 &nbsp;·&nbsp; All data processed in your browser</p>
+  </div>
+
+  <script src="js/supabase-client.js"></script>
+  <script>
+    const emailEl   = document.getElementById('email');
+    const passEl    = document.getElementById('password');
+    const loginBtn  = document.getElementById('loginBtn');
+    const signupBtn = document.getElementById('signupBtn');
+    const msgEl     = document.getElementById('message');
+
+    function setMsg(text, isError = false) {
+      msgEl.textContent = text;
+      msgEl.style.color = isError ? 'var(--danger)' : 'var(--success)';
+    }
+
+    function setBusy(busy) {
+      loginBtn.disabled  = busy;
+      signupBtn.disabled = busy;
+    }
+
+    async function handleLogin() {
+      const email = emailEl.value.trim();
+      const pass  = passEl.value.trim();
+      if (!email || !pass) { setMsg('Please enter your email and password.', true); return; }
+      setBusy(true);
+      try {
+        const { error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
+        if (error) { setMsg(error.message, true); return; }
+        window.location.href = 'dashboard.html';
+      } catch (e) {
+        setMsg(e.message || 'Login failed.', true);
+      } finally {
+        setBusy(false);
+      }
+    }
+
+    async function handleSignup() {
+      const email = emailEl.value.trim();
+      const pass  = passEl.value.trim();
+      if (!email || !pass) { setMsg('Please enter your email and password.', true); return; }
+      setBusy(true);
+      try {
+        const { error } = await supabaseClient.auth.signUp({ email, password: pass });
+        if (error) { setMsg(error.message, true); return; }
+        setMsg('Account created! Check your email if confirmation is enabled.');
+      } catch (e) {
+        setMsg(e.message || 'Signup failed.', true);
+      } finally {
+        setBusy(false);
+      }
+    }
+
+    loginBtn.addEventListener('click', handleLogin);
+    signupBtn.addEventListener('click', handleSignup);
+    passEl.addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
+
+    // Auto-redirect if already logged in
+    (async function () {
+      const { data } = await supabaseClient.auth.getSession();
+      if (data?.session) window.location.href = 'dashboard.html';
+    })();
+  </script>
+</body>
+</html>
