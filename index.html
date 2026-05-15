@@ -300,10 +300,6 @@
 
       <button id="loginBtn" class="btn btn-primary" type="button">Login</button>
 
-      <div class="divider"><span>OR</span></div>
-
-      <button id="signupBtn" class="btn btn-outline" type="button">Create Account</button>
-
       <p id="message"></p>
     </div>
 
@@ -315,7 +311,6 @@
     const emailEl   = document.getElementById('email');
     const passEl    = document.getElementById('password');
     const loginBtn  = document.getElementById('loginBtn');
-    const signupBtn = document.getElementById('signupBtn');
     const msgEl     = document.getElementById('message');
 
     function setMsg(text, isError = false) {
@@ -324,8 +319,7 @@
     }
 
     function setBusy(busy) {
-      loginBtn.disabled  = busy;
-      signupBtn.disabled = busy;
+      loginBtn.disabled = busy;
     }
 
     async function handleLogin() {
@@ -344,24 +338,7 @@
       }
     }
 
-    async function handleSignup() {
-      const email = emailEl.value.trim();
-      const pass  = passEl.value.trim();
-      if (!email || !pass) { setMsg('Please enter your email and password.', true); return; }
-      setBusy(true);
-      try {
-        const { error } = await supabaseClient.auth.signUp({ email, password: pass });
-        if (error) { setMsg(error.message, true); return; }
-        setMsg('Account created! Check your email if confirmation is enabled.');
-      } catch (e) {
-        setMsg(e.message || 'Signup failed.', true);
-      } finally {
-        setBusy(false);
-      }
-    }
-
     loginBtn.addEventListener('click', handleLogin);
-    signupBtn.addEventListener('click', handleSignup);
     passEl.addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
 
     // Auto-redirect if already logged in
