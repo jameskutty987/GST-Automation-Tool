@@ -92,7 +92,7 @@ async function ensureAuthenticated() {
   const { data, error } = await supabaseClient.auth.getSession();
   if (error) throw new Error(error.message);
   if (!data || !data.session) {
-    window.location.href = "login.html";
+    window.location.href = "../../index.html";
     throw new Error("No active login session found.");
   }
   return data.session;
@@ -1584,7 +1584,7 @@ btnFullBillsExcel.addEventListener("click", () => {
 
 logoutBtn.addEventListener("click", async () => {
   await supabaseClient.auth.signOut();
-  window.location.href = "login.html";
+  window.location.href = "../../index.html";
 });
 
 bindUploadZone();

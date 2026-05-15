@@ -65,7 +65,7 @@ async function handleLogin() {
       return;
     }
 
-    window.location.href = "./gstr1-to-tally-pro-v2.html";
+    window.location.href = "../../dashboard.html";
   } catch (err) {
     showMessage(err.message || "Login failed.", true);
   } finally {
