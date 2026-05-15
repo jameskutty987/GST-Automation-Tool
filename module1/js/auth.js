@@ -20,7 +20,7 @@ async function handleSignup() {
   }
 
   try {
-    if (signupBtn) signupBtn.disabled = true;
+    //if (signupBtn) signupBtn.disabled = true;
     if (loginBtn) loginBtn.disabled = true;
 
     const { error } = await supabaseClient.auth.signUp({
@@ -37,7 +37,7 @@ async function handleSignup() {
   } catch (err) {
     showMessage(err.message || "Signup failed.", true);
   } finally {
-    if (signupBtn) signupBtn.disabled = false;
+    //if (signupBtn) signupBtn.disabled = false;
     if (loginBtn) loginBtn.disabled = false;
   }
 }
@@ -52,7 +52,7 @@ async function handleLogin() {
   }
 
   try {
-    if (signupBtn) signupBtn.disabled = true;
+    //if (signupBtn) signupBtn.disabled = true;
     if (loginBtn) loginBtn.disabled = true;
 
     const { error } = await supabaseClient.auth.signInWithPassword({
@@ -69,12 +69,12 @@ async function handleLogin() {
   } catch (err) {
     showMessage(err.message || "Login failed.", true);
   } finally {
-    if (signupBtn) signupBtn.disabled = false;
+    //if (signupBtn) signupBtn.disabled = false;
     if (loginBtn) loginBtn.disabled = false;
   }
 }
 
-signupBtn?.addEventListener("click", handleSignup);
+//signupBtn?.addEventListener("click", handleSignup);
 loginBtn?.addEventListener("click", handleLogin);
 
 passwordInput?.addEventListener("keydown", (e) => {
